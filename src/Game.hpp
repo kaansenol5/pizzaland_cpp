@@ -32,4 +32,9 @@ private:
   Entity* pizza;
   Text* scoreText;
   Text* missesText;
+  Text* levelText;
+  Text* GameWonText;
+  Text* MaxSpeedText;
+  bool over = false;
+
 };

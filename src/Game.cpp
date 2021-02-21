@@ -29,6 +29,10 @@ Game::Game(const char* title, int x, int y, int w, int h){
     pizza = new Entity(renderer,0,0,96,96,IMG_Load("assets/pizza.png"));;
     scoreText = new Text({0,255,0},{0,0,130,70});
     missesText = new Text({255,0,0},{370,0,130,70});
+    levelText = new Text({255,255,255},{185,0,130,70});
+    GameWonText = new Text({255,255,255},{190,0,130,70});
+    GameWonText->updateText(renderer, "U WON", 0);
+    
   }
   else{
     isRunning = false;
@@ -45,6 +49,11 @@ void Game::handleEvents(){
   if(state[SDL_SCANCODE_D]){
     player->dstrect.x += player->movement_speed;
   }
+  if(over){
+    if(state[SDL_SCANCODE_RETURN]){
+      over=false;
+    }
+  }
   SDL_PollEvent(&event);
   switch (event.type) {
     case SDL_QUIT:
@@ -56,6 +65,10 @@ void Game::handleEvents(){
 }
 
 void Game::update(){
+  if(score==255){
+    over=true;
+    score=0;
+  }
   pizza->dstrect.y += pizza->movement_speed;
   if(calculateCollusion(pizza->dstrect, player->dstrect)){
     score++;
@@ -71,39 +84,50 @@ void Game::update(){
   }
   scoreText->updateText(renderer, "Score: ", score);
   missesText->updateText(renderer, "Misses: ", misses);
+  levelText->updateText(renderer, "Level: ", level);
+
   if(score==0){
     level=0;
+    misses=0;
     player->movement_speed=3;
     pizza->movement_speed=3;
   }
   if(misses>5){
     score=0;
-    misses=0;
   }
 }
 
 void Game::render(){
   SDL_RenderClear(renderer);
-//render entities
   background->render(renderer);
-  player->render(renderer);
-  pizza->render(renderer);
 
-//render text
-  scoreText->render(renderer);
-  missesText->render(renderer);
+  if(!over){
+  //render entities
+    player->render(renderer);
+    pizza->render(renderer);
+
+  //render text
+    scoreText->render(renderer);
+    missesText->render(renderer);
+    levelText->render(renderer);
+
+  }
+  else{
+    GameWonText->render(renderer);
+  }
   SDL_RenderPresent(renderer);
-
 
 }
 
 Game::~Game(){
   SDL_DestroyWindow(window);
   SDL_DestroyRenderer(renderer);
-  SDL_Quit();
-  std::cout << "Bye" << std::endl;
   delete player;
   delete background;
+  delete scoreText;
+  delete missesText;
+  SDL_Quit();
+  std::cout << "Bye" << std::endl;
 }
 
 bool Game::calculateCollusion(SDL_Rect obj1, SDL_Rect obj2){
@@ -123,14 +147,14 @@ bool Game::running(){
 void Game::levelSystem(){
   if(score % 10 == 0 && score != 0){
     level++;
-    std::cout << unsigned(level) << std::endl;
-    std::cout << unsigned(player->movement_speed) << std::endl;
-    std::cout << unsigned(pizza->movement_speed) << std::endl;
+//    std::cout << unsigned(level) << std::endl;
+  //  std::cout << unsigned(player->movement_speed) << std::endl;
+    //std::cout << unsigned(pizza->movement_speed) << std::endl;
 
-    if(player->movement_speed < 9){
+    if(player->movement_speed < 11){
       player->movement_speed += level;
     }
-    if(pizza->movement_speed < 9){
+    if(pizza->movement_speed < 11){
       pizza->movement_speed += level;
     }
   }

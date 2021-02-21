@@ -16,7 +16,7 @@ Entity::Entity(SDL_Renderer* renderer, short x, short y, short width, short heig
 
 void Entity::render(SDL_Renderer* renderer){
   SDL_RenderCopy(renderer, texture, NULL, &dstrect);
-  SDL_RenderDrawRect(renderer, &dstrect);
+  //SDL_RenderDrawRect(renderer, &dstrect);
 
 }
 
